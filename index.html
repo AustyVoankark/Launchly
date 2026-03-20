@@ -636,7 +636,7 @@
       <h2>Ready to grow with AI?</h2>
       <p>Tell us your email and we'll reach out within 24 hours to discuss your use case.</p>
       <form class="cta-form" id="ctaForm" onsubmit="handleSubmit(event)">
-        <input type="email" class="cta-input" placeholder="your@email.com" required />
+        <input type="email" name="email" class="cta-input" placeholder="your@email.com" required />
         <button type="submit" class="btn-primary" style="white-space:nowrap;border:none;cursor:pointer;">Get In Touch →</button>
       </form>
       <div class="success-msg" id="successMsg">✅ We'll be in touch within 24 hours!</div>
@@ -698,8 +698,32 @@
   // Form submit
   function handleSubmit(e) {
     e.preventDefault();
-    document.getElementById('ctaForm').style.display = 'none';
-    document.getElementById('successMsg').style.display = 'block';
+    const form = document.getElementById('ctaForm');
+    const emailInput = form.querySelector('input[name="email"]');
+    const btn = form.querySelector('button');
+    btn.disabled = true;
+    btn.textContent = 'Sending...';
+
+    fetch('https://formspree.io/f/mbdzbkyr', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email: emailInput.value })
+    })
+    .then(res => {
+      if (res.ok) {
+        form.style.display = 'none';
+        document.getElementById('successMsg').style.display = 'block';
+      } else {
+        btn.disabled = false;
+        btn.textContent = 'Get In Touch →';
+        alert('Something went wrong. Please try again.');
+      }
+    })
+    .catch(() => {
+      btn.disabled = false;
+      btn.textContent = 'Get In Touch →';
+      alert('Network error. Please try again.');
+    });
   }
 </script>
 </body>
